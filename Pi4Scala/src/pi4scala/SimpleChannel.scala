@@ -19,7 +19,7 @@ class SimpleChannel[A] extends Channel[A] {
     if(writeRequest.length == 0) {
       readRequest += r
       true
-    } else {
+    } else if(! r.isComplete()){
       val random = gen.nextInt(writeRequest.length)
       val selected = writeRequest(random)
       val (flag,res) = selected.getVal()
@@ -32,13 +32,15 @@ class SimpleChannel[A] extends Channel[A] {
       } else {
         false
       }
+    } else {
+      true
     }
   }
   def addWriteRequest(w: Request[A]) :Boolean = synchronized {
     if(readRequest.length == 0) {
       writeRequest += w
       true
-    } else {
+    } else if(! w.isComplete()){
       val random = gen.nextInt(readRequest.length)
       val selected = readRequest(random)
       val (flag,res) = w.getVal()
@@ -51,6 +53,8 @@ class SimpleChannel[A] extends Channel[A] {
       } else {
         false
       }
+    } else {
+      true
     }
   }
   def removeRequest(r: Request[A]) = synchronized{

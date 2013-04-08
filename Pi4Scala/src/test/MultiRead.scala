@@ -7,7 +7,7 @@ object MultiRead {
     val m2 = new SimpleChannel[Int]
     def multiple(m1:Channel[Int],m2:Channel[Int]) = {
       val l = new LocalBuffer[Int](0)
-      val ch = new Choice();
+      /*val ch = new Choice();
       ch.addRead(l,m1, () => {
         println("Letto " + l + "da m1")
       })
@@ -22,8 +22,7 @@ object MultiRead {
       ch1.addRead(l,m2, () => {
         println("Letto " + l + "da m2")
       })
-      ch1.execute()
-      /*
+      ch1.execute()*/
       select(
         (l<==m1){
           println("Letto" + l + "da m1")
@@ -39,7 +38,7 @@ object MultiRead {
         (l<==m2){
           println("Letto" + l + "da m2")
         }
-      )*/
+      )
     }
     def writer(chan: Channel[Int], v: Int) = {
       val l = new LocalBuffer[Int](v)
