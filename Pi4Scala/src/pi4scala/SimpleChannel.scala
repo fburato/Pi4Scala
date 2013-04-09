@@ -19,10 +19,9 @@ class SimpleChannel[A] extends Channel[A] {
     val ch = SimpleChannel.this
   }
 
-  def addReadRequest(r: Request[A]): Boolean = {
+  def addReadRequest(r: Request[A]) = {
     if (writeRequest.length == 0) {
       readRequest += r
-      true
     } else if (!r.isComplete()) {
       def performCheck(actual: Int, req: Request[A], array: ArrayBuffer[Request[A]]): Boolean = {
         val selected = array(actual)
@@ -48,11 +47,8 @@ class SimpleChannel[A] extends Channel[A] {
       }
       val first = gen.nextInt(writeRequest.length)
       val f = getGenerator(writeRequest.length)
-      if(checkExistence(f(first),f,first)) {
-        true
-      } else {
-        writeRequest += r
-        true
+      if(!checkExistence(f(first),f,first)) {
+        readRequest += r
       }
       /*val random = gen.nextInt(writeRequest.length)
       val selected = writeRequest(random)
@@ -66,9 +62,7 @@ class SimpleChannel[A] extends Channel[A] {
       } else {
         false
       }*/
-    } else {
-      true
-    }
+    } 
   }
   private def getGenerator(length: Int): (Int) => Int = {
     val inc = if (length % 17 == 0) 19 else 17
@@ -77,10 +71,9 @@ class SimpleChannel[A] extends Channel[A] {
     }
   }
   
-  def addWriteRequest(w: Request[A]): Boolean = {
+  def addWriteRequest(w: Request[A]) = {
     if (readRequest.length == 0) {
       writeRequest += w
-      true
     } else if (!w.isComplete()) {
       def performCheck(actual: Int, req: Request[A], array: ArrayBuffer[Request[A]]): Boolean = {
         val selected = array(actual)
@@ -105,11 +98,8 @@ class SimpleChannel[A] extends Channel[A] {
       }
       val first = gen.nextInt(readRequest.length)
       val f = getGenerator(readRequest.length)
-      if(checkExistence(f(first),f,first)) {
-        true
-      } else {
+      if(!checkExistence(f(first),f,first)) {
         writeRequest += w
-        true
       }
       /*val random = gen.nextInt(readRequest.length)
       val selected = readRequest(random)
@@ -123,9 +113,7 @@ class SimpleChannel[A] extends Channel[A] {
       } else {
         false
       }*/
-    } else {
-      true
-    }
+    } 
   }
 
   def removeRequest(r: Request[A]) = {
@@ -152,7 +140,7 @@ class SimpleChannel[A] extends Channel[A] {
     val sr = new SimpleRequest[A](lb)
     lock.acquire
     try {
-      while (!addWriteRequest(sr)) {}
+      addWriteRequest(sr)
     } finally {
       lock.release
     }

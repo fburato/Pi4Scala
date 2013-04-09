@@ -83,7 +83,7 @@ class Choice {
   def addRead[A](lb: LocalBuffer[A], chan: Channel[A], executor: () => Unit) = {
     val r = new ChoiceRequest(lb, executor)
     requests = (() => {
-      while (!chan.addReadRequest(r)) {}
+      chan.addReadRequest(r)
     }) :: requests
     removers = (() => {
       val l = chan.getLock
@@ -100,7 +100,7 @@ class Choice {
   def addWrite[A](chan: Channel[A], lb: LocalBuffer[A], executor: () => Unit) = {
     val r = new ChoiceRequest(lb, executor)
     requests = (() => {
-      while (!chan.addWriteRequest(r)) {}
+      chan.addWriteRequest(r)
     }) :: requests
     removers = (() => {
       chan.removeRequest(r)

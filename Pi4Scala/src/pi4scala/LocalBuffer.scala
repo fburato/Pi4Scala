@@ -14,7 +14,7 @@ class LocalBuffer[A](init: A) {
     val sr = new SimpleRequest[A](this)
     chan.getLock.acquire
     try {
-      while (!chan.addReadRequest(sr)) {}
+      chan.addReadRequest(sr)
     } finally {
       chan.getLock.release
     }
