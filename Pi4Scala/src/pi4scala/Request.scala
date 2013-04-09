@@ -5,14 +5,5 @@ abstract class Request[A] {
   def getVal() : (Boolean,A)
   def isComplete() : Boolean
   def setComplete()
+  def getLock(): AnyRef
 }
-
-/*
- * public interface Request<A> {
-  public boolean setVal(A val);
-  public Couple<A> getVal();
-  public boolean isComplete();
-  public void setComplete();
-}
- * 
- */

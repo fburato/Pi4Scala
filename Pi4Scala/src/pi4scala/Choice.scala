@@ -1,37 +1,34 @@
 package pi4scala
 
 import scala.util.Random
+import scala.concurrent.Lock
+object Choice {
+  val choiceLock = new Lock
+}
 
 class Choice {
   private class ChoiceRequest[A](lb: LocalBuffer[A], e: () => Unit) extends Request[A] {
-    def setVal(v: A): Boolean = Choice.this.synchronized {
-      if (Choice.this.isComplete())
-        false
-      else {
-        lb.set(v)
-        Choice.this.setNext(e)
-        true
-      }
+    def setVal(v: A): Boolean =  {
+      lb.set(v)
+      true
     }
-    def getVal(): (Boolean, A) = Choice.this.synchronized {
-      if (Choice.this.isComplete())
-        (false, lb get)
-      else {
-        Choice.this.setNext(e);
+    def getVal(): (Boolean, A) =  {
         (true, lb get)
-      }
     }
-    def isComplete(): Boolean = Choice.this.synchronized {
+    def isComplete(): Boolean =  {
       Choice.this.isComplete()
     }
     def setComplete() = Choice.this.synchronized {
+      Choice.this.setNext(e)
       Choice.this.notify
     }
+    def getLock() = Choice.this
   }
   private var e: () => Unit = () => {}
   private var complete: Boolean = false
-  var requests: List[() => Unit] = Nil
-  var removers: List[() => Unit] = Nil
+  private var requests: List[() => Unit] = Nil
+  private var removers: List[() => Unit] = Nil
+  private var locks: List[Lock] = Nil
   def setNext(newe: () => Unit) {
     e = newe
     complete = true
@@ -50,8 +47,32 @@ class Choice {
   }
 
   def execute() = {
-    val shuffled = Random.shuffle(requests)
-    exec(shuffled)
+    Choice.choiceLock.acquire
+    try {
+      def lockAll(list: List[Lock]): Unit = list match  {
+        case Nil => {}
+        case head::tail => {
+          head.acquire
+          lockAll(tail)
+        }
+      }
+      def unlockAll(list: List[Lock]): Unit = list match {
+        case Nil => {}
+        case head::tail => {
+          head.release
+          unlockAll(tail)
+        }
+      } 
+      lockAll(locks)
+      try {
+        val shuffled = Random.shuffle(requests)
+        exec(shuffled)
+      } finally {
+        unlockAll(locks)
+      }
+    } finally {
+      Choice.choiceLock.release
+    }
     synchronized {
       while (!isComplete()) wait()
     }
@@ -65,8 +86,15 @@ class Choice {
       while (!chan.addReadRequest(r)) {}
     }) :: requests
     removers = (() => {
-      chan.removeRequest(r)
+      val l = chan.getLock
+      l.acquire
+      try {
+        chan.removeRequest(r)
+      } finally {
+        l.release
+      }
     }) :: removers
+    locks = chan.getLock :: locks
   }
 
   def addWrite[A](chan: Channel[A], lb: LocalBuffer[A], executor: () => Unit) = {
@@ -77,6 +105,7 @@ class Choice {
     removers = (() => {
       chan.removeRequest(r)
     }) :: removers
+    locks = chan.getLock :: locks
   }
 
 }

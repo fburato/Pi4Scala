@@ -16,5 +16,5 @@ class SimpleRequest[A](lb: LocalBuffer[A]) extends Request[A] {
       complete = true
       notify()
     }
-
+  def getLock() = this
 }

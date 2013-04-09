@@ -1,7 +1,7 @@
 package pi4scala
 object LocalBuffer {
   implicit def toLocalBuffer[A](v: A) = new LocalBuffer[A](v)
-  implicit def toValueA[A](lb: LocalBuffer[A]) : A = lb get
+  implicit def toValueA[A](lb: LocalBuffer[A]): A = lb get
 }
 class LocalBuffer[A](init: A) {
   abstract class WrapBuffer extends WrapOperation {
@@ -9,28 +9,33 @@ class LocalBuffer[A](init: A) {
   }
   var value = init
   def get = value
-  def set(a:A) = { value = a}
-  def read(chan: Channel[A]):A = {
+  def set(a: A) = { value = a }
+  def read(chan: Channel[A]): A = {
     val sr = new SimpleRequest[A](this)
-    while(!chan.addReadRequest(sr)){}
+    chan.getLock.acquire
+    try {
+      while (!chan.addReadRequest(sr)) {}
+    } finally {
+      chan.getLock.release
+    }
     sr.synchronized {
-      while(!sr.isComplete) 
+      while (!sr.isComplete) {
         sr.wait()
+      }
     }
     value
   }
-  def <-- (chan: Channel[A]) = read(chan)
-  
-  def <== (chan:Channel[A])(exe : => Unit): WrapOperation =
+  def <--(chan: Channel[A]) = read(chan)
+
+  def <==(chan: Channel[A])(exe: => Unit): WrapOperation =
     new WrapBuffer {
-    def update(sum: Choice) = {
-      sum.addRead(lb,chan,() => exe)
+      def update(sum: Choice) = {
+        sum.addRead(lb, chan, () => exe)
+      }
     }
-  }
-    //new ReadOperation[A](chan,this,() => exe)
-  
-  
-  def :=(v : A) = set (v)
-  
+  //new ReadOperation[A](chan,this,() => exe)
+
+  def :=(v: A) = set(v)
+
   override def toString(): String = value.toString()
 }
