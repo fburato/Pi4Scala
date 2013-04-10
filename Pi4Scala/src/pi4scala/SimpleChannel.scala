@@ -26,7 +26,7 @@ class SimpleChannel[A] extends Channel[A] {
       def performCheck(actual: Int, req: Request[A], array: ArrayBuffer[Request[A]]): Boolean = {
         val selected = array(actual)
         selected.getLock.synchronized {
-          if (!selected.isComplete()) {
+          if (!selected.getLock.eq(req.getLock) && !selected.isComplete() ) {
             val (flag, res) = selected.getVal()
             req.setVal(res)
             array(actual) = array(array.length - 1)
@@ -79,7 +79,7 @@ class SimpleChannel[A] extends Channel[A] {
         val selected = array(actual)
         selected.getLock.synchronized {
           val (flag, res) = req.getVal()
-          if (selected.setVal(res)) {
+          if (! selected.getLock.eq(req.getLock) && selected.setVal(res)) {
             req.setComplete
             selected.setComplete
             array(actual) = array(array.length - 1)
