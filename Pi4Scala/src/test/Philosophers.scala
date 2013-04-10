@@ -36,9 +36,10 @@ object Philosophers {
     for(i<- Range(0,nPhil-1)) {
       scalaGo({philosopher(i,forks(i),forks(i+1))})
     }
-    //deadlock
-    //scalaGo({philosopher(nPhil-1,forks(0),forks(nPhil-1))})
-    scalaGo({philosopher(nPhil-1,forks(nPhil-1),forks(0))})
+    // nodeadlock
+    scalaGo({philosopher(nPhil-1,forks(0),forks(nPhil-1))})
+    // deadlock
+    //scalaGo({philosopher(nPhil-1,forks(nPhil-1),forks(0))})
   }
 
 }

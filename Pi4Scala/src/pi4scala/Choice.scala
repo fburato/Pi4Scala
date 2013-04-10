@@ -52,7 +52,10 @@ class Choice {
       def lockAll(list: List[Lock]): Unit = list match  {
         case Nil => {}
         case head::tail => {
-          head.acquire
+          head.synchronized{
+            if(head.available)
+              head.acquire
+          }
           lockAll(tail)
         }
       }
