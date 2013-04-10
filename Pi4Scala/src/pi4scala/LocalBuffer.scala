@@ -33,7 +33,6 @@ class LocalBuffer[A](init: A) {
         sum.addRead(lb, chan, () => exe)
       }
     }
-  //new ReadOperation[A](chan,this,() => exe)
 
   def :=(v: A) = set(v)
 

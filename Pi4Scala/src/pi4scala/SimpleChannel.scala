@@ -26,7 +26,7 @@ class SimpleChannel[A] extends Channel[A] {
       def performCheck(actual: Int, req: Request[A], array: ArrayBuffer[Request[A]]): Boolean = {
         val selected = array(actual)
         selected.getLock.synchronized {
-          if (!selected.getLock.eq(req.getLock) && !selected.isComplete() ) {
+          if (!selected.getLock.eq(req.getLock) && !selected.isComplete()) {
             val (flag, res) = selected.getVal()
             req.setVal(res)
             array(actual) = array(array.length - 1)
@@ -40,29 +40,17 @@ class SimpleChannel[A] extends Channel[A] {
         }
       }
       def checkExistence(actual: Int, gen: (Int) => Int, first: Int): Boolean = {
-        if(actual == first)
-          performCheck(first,r,writeRequest)
+        if (actual == first)
+          performCheck(first, r, writeRequest)
         else
-          performCheck(actual,r,writeRequest) || checkExistence(gen(actual),gen,first)
+          performCheck(actual, r, writeRequest) || checkExistence(gen(actual), gen, first)
       }
       val first = gen.nextInt(writeRequest.length)
       val f = getGenerator(writeRequest.length)
-      if(!checkExistence(f(first),f,first)) {
+      if (!checkExistence(f(first), f, first)) {
         readRequest += r
       }
-      /*val random = gen.nextInt(writeRequest.length)
-      val selected = writeRequest(random)
-      val (flag, res) = selected.getVal()
-      writeRequest(random) = writeRequest(writeRequest.length - 1)
-      writeRequest.remove(writeRequest.length - 1)
-      if (flag && r.setVal(res)) {
-        r.setComplete
-        selected.setComplete
-        true
-      } else {
-        false
-      }*/
-    } 
+    }
   }
   private def getGenerator(length: Int): (Int) => Int = {
     val inc = if (length % 17 == 0) 19 else 17
@@ -70,7 +58,7 @@ class SimpleChannel[A] extends Channel[A] {
       (inc + x) % length
     }
   }
-  
+
   def addWriteRequest(w: Request[A]) = {
     if (readRequest.length == 0) {
       writeRequest += w
@@ -79,7 +67,7 @@ class SimpleChannel[A] extends Channel[A] {
         val selected = array(actual)
         selected.getLock.synchronized {
           val (flag, res) = req.getVal()
-          if (! selected.getLock.eq(req.getLock) && selected.setVal(res)) {
+          if (!selected.getLock.eq(req.getLock) && selected.setVal(res)) {
             req.setComplete
             selected.setComplete
             array(actual) = array(array.length - 1)
@@ -91,29 +79,17 @@ class SimpleChannel[A] extends Channel[A] {
         }
       }
       def checkExistence(actual: Int, gen: (Int) => Int, first: Int): Boolean = {
-        if(actual == first)
-          performCheck(first,w,readRequest)
+        if (actual == first)
+          performCheck(first, w, readRequest)
         else
-          performCheck(actual,w,readRequest) || checkExistence(gen(actual),gen,first)
+          performCheck(actual, w, readRequest) || checkExistence(gen(actual), gen, first)
       }
       val first = gen.nextInt(readRequest.length)
       val f = getGenerator(readRequest.length)
-      if(!checkExistence(f(first),f,first)) {
+      if (!checkExistence(f(first), f, first)) {
         writeRequest += w
       }
-      /*val random = gen.nextInt(readRequest.length)
-      val selected = readRequest(random)
-      val (flag, res) = w.getVal()
-      readRequest(random) = readRequest(readRequest.length - 1)
-      readRequest.remove(readRequest.length - 1)
-      if (flag && selected.setVal(res)) {
-        w.setComplete
-        selected.setComplete
-        true
-      } else {
-        false
-      }*/
-    } 
+    }
   }
 
   def removeRequest(r: Request[A]) = {
@@ -121,19 +97,6 @@ class SimpleChannel[A] extends Channel[A] {
     writeRequest -= r
   }
 
-  /*
-   * def generate(length: Int) : List[Int] = {
-      def aux(actual: Int, gen: (Int) => Int, first: Int): List[Int] = {
-      if(actual ==first)
-       first :: Nil
-      else
-      actual :: aux(gen(actual),gen,first)
-      }
-      val (first,seed) = (scala.util.Random.nextInt(length),scala.util.Random.nextInt(12))
-      val f = getGenerator(length,seed)
-      aux(f(first),f,first)
-    }
-   */
   def getLock(): Lock = lock
 
   private def write(lb: LocalBuffer[A]): A = {
@@ -150,12 +113,13 @@ class SimpleChannel[A] extends Channel[A] {
     }
     lb.get
   }
+  
   def <--(lb: LocalBuffer[A]): A = write(lb)
+  
   def <==(lb: LocalBuffer[A])(exe: => Unit): WrapOperation =
     new WrapChannel {
       def update(sum: Choice) = {
         sum.addWrite(ch, lb, () => exe)
       }
     }
-  //new WriteOperation(this,lb,() => exe)
 }
