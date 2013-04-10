@@ -10,5 +10,5 @@ package object pi4scala {
     ch.execute
   }
   
-  def scalaGo(func: () => Unit) = (new Thread(new Runnable{def run = func})).start
+  def scalaGo(func: => Unit) = (new Thread(new Runnable{def run = func})).start
 }
