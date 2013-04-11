@@ -8,7 +8,6 @@ package pi4scala
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
-import scala.concurrent.Lock
 
 /**
  * Provides implicit for outputing from the channel without using a [[pi4scala.LocalBuffer]]
@@ -179,7 +178,7 @@ class SimpleChannel[A] extends Channel[A] {
   }
   /**
    * Returns the lock used to access to the current channel
-   *  @return a [[scala.concurrent.Lock]] usable to perform an atomic access
+   *  @return a [[pi4scala.ReentrantLock]] usable to perform an atomic access
    *  to the channel
    */
   def getLock(): ReentrantLock = lock

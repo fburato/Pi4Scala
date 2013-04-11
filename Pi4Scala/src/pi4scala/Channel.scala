@@ -57,7 +57,7 @@ abstract class Channel[A] {
   def <==(lb: LocalBuffer[A])(exe: => Unit): WrapOperation
   /**
    * Returns the lock used to access to the current channel
-   *  @return a [[scala.concurrent.Lock]] usable to perform an atomic access
+   *  @return a [[pi4scala.ReentrantLock]] usable to perform an atomic access
    *  to the channel
    */
   def getLock(): ReentrantLock
