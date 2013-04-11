@@ -1,7 +1,15 @@
+/**
+ * File: Request.scala
+ * Package: pi4scala
+ * Autore: Francesco Burato
+ * Creazione: 11/apr/2013
+ */
 package pi4scala
 /**
  * An interface to a general Request which make possible comunication between
  * threads using [[pi4scala.Channel]]s
+ * 
+ * @author Francesco Burato
  */
 abstract class Request[A] {
   /**

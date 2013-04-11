@@ -1,3 +1,9 @@
+/**
+ * File: SimpleChannel.scala
+ * Package: pi4scala
+ * Autore: Francesco Burato
+ * Creazione: 11/apr/2013
+ */
 package pi4scala
 
 import scala.collection.mutable.ArrayBuffer
@@ -7,6 +13,8 @@ import scala.concurrent.Lock
 /**
  * Provides implicit for outputing from the channel without using a [[pi4scala.LocalBuffer]]
  * as exchange object
+ * 
+ * @author Francesco Burato
  */
 object SimpleChannel {
   /**
@@ -26,6 +34,8 @@ object SimpleChannel {
 /**
  * A simple implementation of [[pi4scala.Channel]] which provides synchronous
  * read and write capabilities
+ * 
+ * @author Francesco Burato
  */
 class SimpleChannel[A] extends Channel[A] {
   // array of request to read from the channel
@@ -35,7 +45,7 @@ class SimpleChannel[A] extends Channel[A] {
   // pseudorandom number generator to randomize access
   private val gen = new Random()
   // lock for using the current channel
-  val lock = new Lock
+  val lock = new ReentrantLock
 
   /**
    * A [[pi4scala.WrapOperation]] which as a reference to the current channel
@@ -172,7 +182,7 @@ class SimpleChannel[A] extends Channel[A] {
    *  @return a [[scala.concurrent.Lock]] usable to perform an atomic access
    *  to the channel
    */
-  def getLock(): Lock = lock
+  def getLock(): ReentrantLock = lock
 
   /**
    * Performs a write from the given buffer to the current channel.

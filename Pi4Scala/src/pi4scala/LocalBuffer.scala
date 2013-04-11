@@ -1,7 +1,15 @@
+/**
+ * File: LocalBuffer.scala
+ * Package: pi4scala
+ * Autore: Francesco Burato
+ * Creazione: 11/apr/2013
+ */
 package pi4scala
 /**
  * Provides implicts to convert from a value to a [[pi4scala.LocalBuffer]] and
  * vice-versa
+ * 
+ * @author Francesco Burato
  */
 object LocalBuffer {
   /**
@@ -20,6 +28,8 @@ object LocalBuffer {
 /**
  * Provides a buffer which [[pi4scala.Channel]] can access to 
  * satisfy their requests.
+ * 
+ * @author Francesco Burato
  * @constructor create a new local buffer with the given value
  * @param init the value which initialize the buffer
  */

@@ -1,14 +1,21 @@
+/**
+ * File: Choice.scala
+ * Package: pi4scala
+ * Autore: Francesco Burato
+ * Creazione: 11/apr/2013
+ */
 package pi4scala
 
 import scala.util.Random
-import scala.concurrent.Lock
 
 /**
  * Provides a unique lock in order to prevent multiple
  * Pi-calculus summation to be resolved by multiple threads.
+ * 
+ * @author Francesco Burato
  */
 private[pi4scala] object Choice {
-  val choiceLock = new Lock
+  val choiceLock = new ReentrantLock
 }
 
 /**
@@ -18,6 +25,8 @@ private[pi4scala] object Choice {
  * when executed serves (nondeterministically) only one of them which is
  * executable i.e. that as received the waited write or read request from
  * another thread.
+ * 
+ * @author Francesco Burato
  */
 private[pi4scala] class Choice {
 
@@ -63,7 +72,7 @@ private[pi4scala] class Choice {
   private var complete: Boolean = false
   private var requests: List[() => Unit] = Nil
   private var removers: List[() => Unit] = Nil
-  private var locks: List[Lock] = Nil
+  private var locks: List[ReentrantLock] = Nil
   
   /**
    * Sets the closure to be executed when one of the Choice requests
@@ -120,14 +129,10 @@ private[pi4scala] class Choice {
        * (i.e. there are not multiple channel synchronized in a channel
        * and the same request) there is no deadlock.
        */
-      def lockAll(list: List[Lock]): Unit = list match {
+      def lockAll(list: List[ReentrantLock]): Unit = list match {
         case Nil => {}
         case head :: tail => {
-          head.synchronized {
-            if (head.available)
-              // control to prevent auto deadlock since Lock are not reentrant
-              head.acquire
-          }
+          head.acquire
           lockAll(tail)
         }
       }
@@ -135,7 +140,7 @@ private[pi4scala] class Choice {
        * Release the lock of every channel in the requests
        * when finishing the adding process 
        */
-      def unlockAll(list: List[Lock]): Unit = list match {
+      def unlockAll(list: List[ReentrantLock]): Unit = list match {
         case Nil => {}
         case head :: tail => {
           head.release

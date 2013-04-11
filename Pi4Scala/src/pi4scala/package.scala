@@ -1,6 +1,15 @@
 /**
+ * File: package.scala
+ * Package: pi4scala
+ * Autore: Francesco Burato
+ * Creazione: 11/apr/2013
+ */
+
+/**
  * Package object for pi4scala. Contains some methods useful to
  * have syntactic sugar.
+ * 
+ * @author Francesco Burato
  */
 package object pi4scala {
   private def defaultValue[U]: U = { class Default[U] { var default: U = _ }; new Default[U].default }

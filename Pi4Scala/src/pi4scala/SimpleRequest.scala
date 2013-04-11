@@ -1,3 +1,9 @@
+/**
+ * File: SimpleRequest.scala
+ * Package: pi4scala
+ * Autore: Francesco Burato
+ * Creazione: 11/apr/2013
+ */
 package pi4scala
 
 /**
@@ -6,6 +12,8 @@ package pi4scala
  * It simply possess a [[pi4scala.LocalBuffer]] in which read and
  * write operation are possible and wakes up the thread executing
  * the requests when completed.
+ * 
+ * @author Francesco Burato
  * 
  * @constructor create a new SimpleRequest with reference to the given
  * local buffer

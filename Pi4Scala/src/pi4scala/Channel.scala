@@ -1,9 +1,15 @@
+/**
+ * File: Channel.scala
+ * Package: pi4scala
+ * Autore: Francesco Burato
+ * Creazione: 11/apr/2013
+ */
 package pi4scala
 
-import scala.concurrent.Lock
 /**
  * An interface to a general Channel which provides basic communication
  *  utility in Pi-calculus style
+ * @author Francesco Burato
  */
 abstract class Channel[A] {
   /**
@@ -54,5 +60,5 @@ abstract class Channel[A] {
    *  @return a [[scala.concurrent.Lock]] usable to perform an atomic access
    *  to the channel
    */
-  def getLock(): Lock
+  def getLock(): ReentrantLock
 }
