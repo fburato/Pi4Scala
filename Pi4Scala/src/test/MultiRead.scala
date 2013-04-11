@@ -9,18 +9,18 @@ object MultiRead {
       val l = new LocalBuffer[Int](0)
       select(
         (l<==m1){
-          println("Letto" + l + "da m1")
+          println("Letto " + l + " da m1")
         },
         (l<==m2){
-          println("Letto" + l + "da m2")
+          println("Letto " + l + " da m2")
         }
       )
       select(
         (l<==m1){
-          println("Letto" + l + "da m1")
+          println("Letto " + l + " da m1")
         },
         (l<==m2){
-          println("Letto" + l + "da m2")
+          println("Letto " + l + " da m2")
         }
       )
     }
@@ -33,23 +33,5 @@ object MultiRead {
     (new Thread(new Runnable{def run = {writer(m2,23)}})).start
 
   }
-  /*
-   *
-    Runnable writer1 = new Runnable() {
-      public void run() {
-        LocalBuffer<Integer> lb = new LocalBuffer<Integer>(17);
-        m1.write(lb);
-      }
-    };
-    Runnable writer2 = new Runnable() {
-      public void run() {
-        LocalBuffer<Integer> lb = new LocalBuffer<Integer>(23);
-        m2.write(lb);
-      }
-    };
-    
-    (new Thread(multiple)).start();
-    (new Thread(writer1)).start();
-    (new Thread(writer2)).start();
-   */
+
 }
